@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="fr">
 
         <head>
                 <!-- Page information -->
                 <meta charset="UTF-8" />
                 <meta name="node_id" content="{node_id}">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <link rel="shortcut icon" href="{html_url_prefix}/favicon.ico" />
+                <link rel="shortcut icon" href="/favicon.ico" />
 
                 <!-- Set title -->
-                <title>{title}</title>
+                <title>{title} {subtitle}</title>
 
                 <!-- Includes -->
                 {dynamic_includes}
@@ -34,7 +34,10 @@
     <div id="page_holder" class="flex_col">
             <div id="header" class="header">
                     <div id="header_flex" class="flex_row">
-                            <a href="{html_url_prefix}/index.html" id="homelink" title="Clear screen and go to homepage">{title}</a>
+                            <div id="custom_homelink">
+                                <div id="custom_title"><a href="{html_url_prefix}/index.html" title="Aller à la page d'accueil">{title}</a></div>
+                                <div id="custom_subtitle"><a href="{html_url_prefix}/index.html" title="Aller à la page d'accueil">{subtitle}</a></div>
+                            </div>
                             <div class="navbar-button" onclick="toggle_menu()">
                                     ≡
                             </div>
@@ -52,11 +55,11 @@
                     </div>
                     {theme_popup}
             </div>
-            
+            <!-- <div id="custom-separator"></div> -->
             <div class="graph_full_page">
                 <div class="graph-button-row" style="display:flex;">
                     <button class="graph_button graph_show_button" id="Bgraph_full_page" level="" note_temp_id="graph_full_page" style="visibility: hidden; margin:0px">
-                        Show Graph
+                        Afficher le Graph
                     </button>
                     <button class="graph_button graph_type_button" id="Cgraph_full_page" style="flex:1; margin:0px; margin-right:0.2rem;" onclick="window.ObsHtmlGraph.switch_graph_type(this);">
                         2D

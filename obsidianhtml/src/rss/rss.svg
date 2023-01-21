@@ -1,1 +1,11 @@
-<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 455.731 455.731" style="enable-background:new 0 0 455.731 455.731;" xml:space="preserve"><rect x="0" y="0" style="fill:#FFFFFF00;" width="455.731" height="455.731"/><path style="fill:#c2c9ce;" d="M296.208,159.16C234.445,97.397,152.266,63.382,64.81,63.382v64.348 c70.268,0,136.288,27.321,185.898,76.931c49.609,49.61,76.931,115.63,76.931,185.898h64.348 C391.986,303.103,357.971,220.923,296.208,159.16z"/><path style="fill:#c2c9ce;" d="M64.143,172.273v64.348c84.881,0,153.938,69.056,153.938,153.939h64.348 C282.429,270.196,184.507,172.273,64.143,172.273z"/><circle style="fill:#c2c9ce;" cx="109.833" cy="346.26" r="46.088"/></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="26px" height="26px" viewBox="0 -5 26 26" enable-background="new 0 -5 26 26" xml:space="preserve">
+<rect fill="none" width="16" height="16"/>
+<path fill="#FFFFFF" d="M17.998,2.988C13.481-1.519,7.473-4,1.079-4v4.694c5.137,0,9.963,1.993,13.591,5.612
+	c3.627,3.621,5.626,8.437,5.626,13.562H25C25,13.488,22.514,7.493,17.998,2.988z"/>
+<path fill="#FFFFFF" d="M1.029,3.943v4.695c6.207,0,11.255,5.039,11.255,11.229h4.707C16.991,11.088,9.83,3.943,1.029,3.943z"/>
+<ellipse fill="#FFFFFF" cx="4.37" cy="16.638" rx="3.37" ry="3.362"/>
+</svg>

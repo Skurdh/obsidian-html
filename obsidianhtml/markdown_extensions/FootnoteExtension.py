@@ -61,7 +61,6 @@ class FootnoteExtension(Extension):
         self.found_refs = {}
         self.used_refs = set()
         self.inc = 0
-        self.replacement_inc = 0
 
         self.reset()
 
@@ -101,9 +100,6 @@ class FootnoteExtension(Extension):
         self.unique_prefix += 1
         self.found_refs = {}
         self.used_refs = set()
-        self.codeblocks = {}
-        self.codelines = {}
-
 
     def unique_ref(self, reference, found=False):
         """ Get a unique reference if there are duplicates. """
@@ -146,38 +142,30 @@ class FootnoteExtension(Extension):
 
     def StripCodeSections(self, block):
         """(Temporarily) Remove codeblocks/-lines so that they are not altered in all the conversions. Placeholders are inserted."""
-        codeblocks = re.findall("^```([\s\S]*?)```[\s]*?$", block, re.MULTILINE)
-        for i, codeblock in enumerate(codeblocks):
-            rid = self.getReplacementId()
-            self.codeblocks[rid] = codeblock
-            block = block.replace("```"+codeblock+"```", f'%%%codeblock-placeholder-{rid}%%%')
 
-        codelines = re.findall("`(.*?)`", block)
-        for i, codeline in enumerate(codelines):
-            rid = self.getReplacementId()
-            self.codelines[rid] = codeline
-            block = block.replace("`"+codeline+"`", f'%%%codeline-placeholder-{rid}%%%')
+        self.codeblocks = re.findall("^```([\s\S]*?)```[\s]*?$", block, re.MULTILINE)
+        for i, match in enumerate(self.codeblocks):
+            block = block.replace("```"+match+"```", f'%%%codeblock-placeholder-{i}%%%')
+            
+        self.codelines = re.findall("`(.*?)`", block)
+        for i, match in enumerate(self.codelines):
+            block = block.replace("`"+match+"`", f'%%%codeline-placeholder-{i}%%%')
 
         return block
 
     def RestoreCodeSections(self, block):
         """Undo the action of StripCodeSections."""
-        for rid in self.codeblocks.keys():
-            value = self.codeblocks[rid]
+        for i, value in enumerate(self.codeblocks):
             block = block.replace(f'%%%codeblock-placeholder-{i}%%%', f"```{value}```\n")
-        for rid in self.codelines.keys():
-            value = self.codelines[rid]
-            block = block.replace(f'%%%codeline-placeholder-{rid}%%%', f"`{value}`")  
+        for i, value in enumerate(self.codelines):
+            block = block.replace(f'%%%codeline-placeholder-{i}%%%', f"`{value}`")  
+
         return block
 
 
     def getId(self):
         self.inc += 1
         return self.inc
-
-    def getReplacementId(self):
-        self.replacement_inc += 1
-        return self.replacement_inc
 
     def getKey(self, name):
         message = name
@@ -198,7 +186,7 @@ class FootnoteExtension(Extension):
         i, fn = self.getFootnoteByName(name)
         if fn is None:
             raise Exception('Expected footnote definition')
-        self.footnotes[i]['text'] = self.RestoreCodeSections(text)
+        self.footnotes[i]['text'] = text
 
 
     def setFootnoteOrderLookup(self, name):
@@ -255,13 +243,10 @@ class FootnoteExtension(Extension):
         for index, fn in enumerate(self.footnotes):
             li = etree.SubElement(ol, "li")
             li.set("id", self.makeFootnoteId(fn['id']))
-
             # Parse footnote with surrogate parent as li cannot be used.
             # List block handlers have special logic to deal with li.
             # When we are done parsing, we will copy everything over to li.
-            if fn['text'] is not None:
-                text = self.RestoreCodeSections(fn['text'])
-                self.parser.parseChunk(surrogate_parent, text)
+            self.parser.parseChunk(surrogate_parent, fn['text'])
 
             for el in list(surrogate_parent):
                 li.append(el)

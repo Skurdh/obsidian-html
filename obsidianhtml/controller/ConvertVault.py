@@ -46,7 +46,6 @@ from ..markdown_extensions.FormattingExtension import FormattingExtension
 from ..markdown_extensions.EmbeddedSearchExtension import EmbeddedSearchExtension
 from ..markdown_extensions.CodeWrapperExtension import CodeWrapperExtension
 from ..markdown_extensions.AdmonitionExtension import AdmonitionExtension
-from ..markdown_extensions.BlockLinkExtension import BlockLinkExtension
 
 def ConvertVault(config_yaml_location=''):
     # Set config
@@ -279,27 +278,27 @@ def convert_markdown_to_html(pb):
             return []
         tags = get_tags(node)
 
-        #if pb.gc('toggles/features/tags_page/styling/show_in_note_footer', cached=True):
-        # Replace placeholder
-        snippet = ''
+        if pb.gc('toggles/features/tags_page/styling/show_in_note_footer', cached=True):
+            # Replace placeholder
+            snippet = ''
 
-        if 'obs.html.tags' in fo.md.metadata.keys() and 'no_tag_footer' in fo.md.metadata['obs.html.tags']:
-            pass
-        else:
-            if tags:
-                snippet = "<h2>Tags</h2>\n<ul>\n"
-                for tag in tags:
-                    url = f'{pb.gc("html_url_prefix")}/obs.html/tags/{tag}/index.html'
-                    snippet += f'\t<li><a class="backlink" href="{url}">{tag}</a></li>\n'
+            if 'obs.html.tags' in fo.md.metadata.keys() and 'no_tag_footer' in fo.md.metadata['obs.html.tags']:
+                pass
+            else:
+                if tags:
+                    snippet = "<h2>Tags</h2>\n<ul>\n"
+                    for tag in tags:
+                        url = f'{pb.gc("html_url_prefix")}/obs.html/tags/{tag}/index.html'
+                        snippet += f'\t<li><a class="backlink" href="{url}">{tag}</a></li>\n'
 
-                    if pb.gc('toggles/preserve_inline_tags', cached=True):
-                        placeholder = re.escape("<code>{_obsidian_pattern_tag_" + tag + "}</code>")
-                        inline_tag = f'<a class="inline-tag" href="{url}">{tag}</a>'
-                        html = re.sub(placeholder, inline_tag, html)
-                snippet += '</ul>'
+                        if pb.gc('toggles/preserve_inline_tags', cached=True):
+                            placeholder = re.escape("<code>{_obsidian_pattern_tag_" + tag + "}</code>")
+                            inline_tag = f'<a class="inline-tag" href="{url}">{tag}</a>'
+                            html = re.sub(placeholder, inline_tag, html)
+                    snippet += '</ul>'
 
-        # replace placeholder with list & write output
-        html = re.sub('\{_obsidian_html_tags_footer_pattern_\}', snippet, html)
+            # replace placeholder with list & write output
+            html = re.sub('\{_obsidian_html_tags_footer_pattern_\}', snippet, html)
 
 
         # add breadcrumbs
@@ -640,7 +639,7 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
     # Get all local markdown links. 
     # ------------------------------------------------------------------
     # This is any string in between '](' and  ')' with no spaces in between the ( and )
-    proper_links = re.findall(r'(?<=\]\()[^\s\]]+?(?=\))', md.page)
+    proper_links = re.findall(r'(?<=\]\()[^\s\]]+(?=\))', md.page)
     for l in proper_links:
         ol = l
         l = urllib.parse.unquote(l)
@@ -689,10 +688,8 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
     # ------------------------------------------------------------------
     for link in re.findall(r'\!\[.*?\]\((.*?)\)', md.page):
         
-        if link.strip() == '':
-            continue
-
         l = urllib.parse.unquote(link)
+
         if l[0] == '/':
             l = l.replace('/', '', 1)
 
@@ -756,12 +753,13 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
             continue
 
         # Copy src to dst
-        if lo.path['markdown']['file_absolute_path'].exists():
-            lo.copy_file('mth')
+        lo.copy_file('mth')
 
         # [11.2] Adjust video link in page to new dst folder (when the link is to a file in our root folder)
         new_link = template.replace('{link}', urllib.parse.quote(lo.get_link('html', origin=fo)))
         safe_link = re.escape(tag)
+        print(2, new_link)
+        print(3, safe_link)
         md.page = re.sub(safe_link, new_link, md.page)
 
     # [?] Handle local embeddable tag-links (copy them over to output)
@@ -852,7 +850,6 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
 
     extensions.append(CodeWrapperExtension())
     extensions.append(AdmonitionExtension())
-    extensions.append(BlockLinkExtension())
     #extensions.append('custom_tables')
 
 
@@ -866,32 +863,29 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
     # [??] Embedded note titles integration
     # ------------------------------------------------------------------
     if pb.config.capabilities_needed['embedded_note_titles']:
-        if 'obs.html.tags' in fo.md.metadata.keys() and 'dont_add_embedded_title' in fo.md.metadata['obs.html.tags']:
-            pass
-        else:
-            title = node['name']
+        title = node['name']
 
-            # overwrite node name (titleMetadataField)
-            if 'titleMetadataField' in pb.config.plugin_settings['embedded_note_titles'].keys():
-                title_key = pb.config.plugin_settings['embedded_note_titles']['titleMetadataField']
-                if title_key in node['metadata'].keys():
-                    title = node['metadata'][title_key]
+        # overwrite node name (titleMetadataField)
+        if 'titleMetadataField' in pb.config.plugin_settings['embedded_note_titles'].keys():
+            title_key = pb.config.plugin_settings['embedded_note_titles']['titleMetadataField']
+            if title_key in node['metadata'].keys():
+                title = node['metadata'][title_key]
 
-            # hide if h1 is present
-            hide = False
-            if pb.gc('toggles/features/embedded_note_titles/hide_on_h1'):
-                header_dict, root_element = ConvertMarkdownToHeaderTree(md.page)
-                if len(root_element['content']) > 0 and isinstance(root_element['content'][0], dict) and root_element['content'][0]['level'] == 1:
-                    hide = True
+        # hide if h1 is present
+        hide = False
+        if 'hideOnH1' in pb.config.plugin_settings['embedded_note_titles'].keys() and pb.config.plugin_settings['embedded_note_titles']['hideOnH1']:
+            header_dict, root_element = ConvertMarkdownToHeaderTree(md.page)
+            if len(root_element['content']) > 0 and isinstance(root_element['content'][0], dict) and root_element['content'][0]['level'] == 1:
+                hide = True
 
-            # hideOnMetadataField
-            if 'hideOnMetadataField' in pb.config.plugin_settings['embedded_note_titles'].keys() and pb.config.plugin_settings['embedded_note_titles']['hideOnMetadataField']:
-                if 'embedded-title' in node['metadata'].keys() and node['metadata']['embedded-title'] == False:
-                    hide = True 
+        # hideOnMetadataField
+        if 'hideOnMetadataField' in pb.config.plugin_settings['embedded_note_titles'].keys() and pb.config.plugin_settings['embedded_note_titles']['hideOnMetadataField']:
+            if 'embedded-title' in node['metadata'].keys() and node['metadata']['embedded-title'] == False:
+                hide = True 
 
-            # add embedded title
-            if not hide:
-                html_body = f"<embeddedtitle>{title.capitalize()}</embeddedtitle>\n" + html_body 
+        # add embedded title
+        if not hide:
+            html_body = f"<embeddedtitle>{title.capitalize()}</embeddedtitle>\n" + html_body 
 
     # ------------------------------------------------------------------
     # [14] Tag external/anchor links with a class so they can be decorated differently

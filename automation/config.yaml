@@ -1,0 +1,46 @@
+obsidian_entrypoint_path_str: D:\.Shortcuts\.Projets\guillivigne-vault\Articles\Accueil.md
+site_name: Guillivigne
+site_subtitle: Documentation
+html_url_prefix: '/minihub'
+navbar_links:
+  - name: Accueil
+    link: index.html
+  - name: Obsidian
+    link: https://obsidian.md/
+    type: external
+  - name: ObsidianHTML
+    link: https://obsidian-html.github.io/
+    type: external
+  - name: Github Fork
+    link: https://github.com/Skurdh/obsidian-html
+    type: external
+toggles:
+  process_all: false
+  relative_path_html: false
+  features:
+    breadcrumbs:
+      enabled: True
+    create_index_from_dir_structure:
+      enabled: true
+      verbose: false
+      rel_output_path: obs.html/dir_index.html
+      styling:
+        show_icon: true
+      exclude_subfolders:
+        - .git
+        - __src
+        - md
+        - obs.html
+        - Articles/medias
+        - Articles/medias/3d_lights/
+        - Articles/medias/wine_soft_install/
+        - medias
+        - medias/3d_lights/
+        - medias/wine_soft_install/
+      exclude_files:
+        - .gitignore
+        - favicon.ico
+        - not_created.html
+      homepage_label: Accueil
+    table_of_contents:
+      add_toc_when_missing: true

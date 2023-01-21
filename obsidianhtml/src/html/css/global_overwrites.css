@@ -37,3 +37,96 @@
 }
 
 /*  ----------------------------------------- /OVERWRITES ------------------------------------------------ */
+@font-face {
+    font-family: 'Subatomic';
+    src: url('{html_url_prefix}/obs.html/static/subatomic.tsoonami.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+#custom-separator {
+    background-color: var(--custom-color);
+    padding-top: 1rem;
+}
+#custom_homelink {
+    display: flex;
+    flex-direction: column;
+    margin-left: 2rem;
+    background: url("{html_url_prefix}/obs.html/static/craie.png") repeat center center;
+	color: #fff;
+	-webkit-text-fill-color: transparent;
+	-webkit-background-clip: text;
+    background-clip: text;
+}
+
+#custom_homelink a {
+    text-decoration: none;
+    color: white;
+}
+
+#custom_title {
+    font-family: 'Subatomic';
+    font-size: 48px;
+    line-height: 36px;
+}
+
+#custom_subtitle {
+    font-family: 'Roboto-Medium';
+    font-style: italic;
+    font-size: 26px;
+}
+
+#custom_theme {
+    border: none;
+    width: 53px;
+    height: 26px;
+    flex-basis: 53px;
+}
+
+.icon-tray .light {
+    background: url("{html_url_prefix}/obs.html/static/light_mode.png") no-repeat;
+}
+
+.icon-tray .dark {
+    background: url("{html_url_prefix}/obs.html/static/dark_mode.png") no-repeat;
+}
+
+.icon-tray div a img {
+    width: 26px;
+}
+
+#level-0 .graph .graph-button-row {
+    background-color: var(--bg-note);
+}
+
+@media (max-width: 602px) {
+    #custom_homelink {
+        text-align: center;
+        margin-left: 0rem;
+    }
+    #custom_homelink #custom-title {
+        font-size: 38px;
+        line-height: 28px;
+    }
+    #custom_homelink #custom-subtitle {
+        display: none;
+    }
+}
+
+.content img, iframe {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.content .caption {
+    text-align: center;
+    text-decoration: underline;
+    font-style: italic;
+}
+
+.content .title {
+    font-size: 30px;
+    font-weight: bold;
+    
+}

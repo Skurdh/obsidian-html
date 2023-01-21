@@ -269,8 +269,12 @@ class CreateIndexFromDirStructure():
                     continue
 
                 file_active = ''
-                if '/'+rel_path == current_page:
-                    file_active = 'active'
+                if self.html_url_prefix != '':
+                    if self.html_url_prefix+'/'+rel_path == current_page:
+                        file_active = 'active'
+                else:
+                    if '/'+rel_path == current_page:
+                        file_active = 'active'
                 
                 # get link adjustment code
                 class_list = ''

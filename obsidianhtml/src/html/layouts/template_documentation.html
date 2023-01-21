@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="fr">
 
         <head>
                 <!-- Page information -->
@@ -10,20 +10,20 @@
                 <link rel="shortcut icon" href="{html_url_prefix}/favicon.ico" />
 
                 <!-- Set title -->
-                <title>{title}</title>
+                <title>{title} {subtitle}</title>
 
                 <!-- Includes -->
                 {dynamic_includes}
 
                 <!-- Onload tweaks -->
                 <script>
-                        const CURRENT_NODE = '{pinnedNode}';
-                        const HTML_URL_PREFIX = '{html_url_prefix}';
+                        const CURRENT_NODE = "{pinnedNode}";
+                        const HTML_URL_PREFIX = "{html_url_prefix}";
                         const PAGE_DEPTH = {page_depth};
                 </script>
         </head>
 
-<body class="theme-obs-light">
+<body class="theme-obs-dark">
         <div id="antiflash" style="display: none;"></div>
         <script>
                 document.getElementById('antiflash').style.display = 'block';
@@ -32,6 +32,7 @@
 
         <div id="page_holder" class="flex_col">
                 {header}
+                <div id="custom-separator"></div>
                 <div class="flex_row">
                         {left_pane}
                         <div class="container">

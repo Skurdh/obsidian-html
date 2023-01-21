@@ -1,8 +1,11 @@
 from ..lib import CreateStaticFilesFolders, OpenIncludedFile, OpenIncludedFileBinary, get_html_url_prefix
 from ..features.SidePane import get_side_pane_id_by_content_selector, get_content_name_by_pane_id
+import shutil
+
 
 def ExportStaticFiles(pb):
     (obsfolder, static_folder, data_folder, rss_folder) = CreateStaticFilesFolders(pb.paths['html_output_folder'])
+
 
     # define files to be copied over (standard copy, static_folder)
     copy_file_list = [
@@ -41,6 +44,9 @@ def ExportStaticFiles(pb):
         copy_file_list.append(['search/search.js', 'search.js'])
         css_files_list.append(['search/search.css', 'search.css'])
         copy_file_list.append(['imported/flexsearch.v0.7.2.bundle.js', 'flexsearch.bundle.js'])
+
+    if pb.config.feature_is_enabled('theme_picker', cached=True):
+        copy_file_list.append(['html/themes/theme.svg', 'theme.svg'])
 
     # if pb.config.feature_is_enabled('math_latex', cached=True):
     #     copy_file_list.append(['latex/load_mathjax.js', 'load_mathjax.js'])
@@ -129,7 +135,19 @@ def ExportStaticFiles(pb):
     # copy binary files to dst (byte copy, static_folder)
     copy_file_list_byte = [
         ['html/fonts/SourceCodePro-Regular.ttf', 'SourceCodePro-Regular.ttf'],
-        ['html/fonts/Roboto-Regular.ttf', 'Roboto-Regular.ttf']
+        ['html/fonts/Roboto-Regular.ttf', 'Roboto-Regular.ttf'],
+        ['html/fonts/Roboto-Medium.ttf', 'Roboto-Medium.ttf'],
+        ['html/fonts/subatomic.tsoonami.ttf', 'subatomic.tsoonami.ttf'],
+        ['custom/craie.png', 'craie.png'],
+        ['custom/dark_mode.png', 'dark_mode.png'],
+        ['custom/light_mode.png', 'light_mode.png'],
+        ['custom/header_background.jpg', 'header_background.jpg'],
+        ['custom/icon_graph.png', 'icon_graph.png'],
+        ['custom/icon_dirtree.png', 'icon_dirtree.png'],
+        ['custom/icon_hashtag.png', 'icon_hashtag.png'],
+        ['custom/icon_rss.png', 'icon_rss.png'],
+        ['custom/icon_search.png', 'icon_search.png'],
+
     ]
     for file_name in copy_file_list_byte:
         c = OpenIncludedFileBinary(file_name[0])
@@ -314,6 +332,10 @@ def PopulateTemplate(pb, node_id, dynamic_inclusions, template, content, html_ur
     if title == '':
         title = pb.gc('site_name', cached=True)
 
+
+    subtitle = pb.gc('site_subtitle', cached=True)
+
+
     if container_wrapper_class_list is None:
         container_wrapper_class_list = []
     if pb.gc('toggles/no_tabs', cached=True):
@@ -324,6 +346,7 @@ def PopulateTemplate(pb, node_id, dynamic_inclusions, template, content, html_ur
     template = template\
         .replace('{node_id}', node_id)\
         .replace('{title}', title)\
+        .replace('{subtitle}', subtitle)\
         .replace('{dynamic_includes}', dynamic_inclusions)\
         .replace('{dynamic_footer_includes}', pb.dynamic_footer_inclusions)\
         .replace('{footer_js_inclusions}', footer_js_inclusions)\

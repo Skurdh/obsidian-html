@@ -97,8 +97,18 @@ function load_theme() {
 
     let theme_name = ls_get('theme_name');
     if (!theme_name){
-        ls_set('theme_name', 'obs-light');
+        ls_set('theme_name', 'obs-dark');
+    } else {
+        let toggle = document.getElementById('custom_theme');
+        if (theme_name == "obs-light" && toggle.classList.contains("dark")) {
+            toggle.classList.remove("dark")
+            toggle.classList.add("light");
+        } else if (theme_name == "obs-dark" && toggle.classList.contains("light")) {
+            toggle.classList.remove("light")
+            toggle.classList.add("dark");
+        }
     }
+    
     set_theme(ls_get('theme_name'));
     disable_antiflash();
 }
@@ -188,7 +198,7 @@ function load_page() {
                     let levelcont = document.getElementsByClassName("container")[0];
                     var el = levelcont.querySelectorAll(link.replaceAll(':', '\\:'))[0];
                     if (el) {
-                        getParentContainer(el).scrollTop = el.offsetTop - rem(6);
+                        getParentContainer(el).scrollTop = el.offsetTop - rem(10);
                         el.classList.add('fade-it');
                         setTimeout(function() {
                             el.classList.remove('fade-it');
@@ -402,7 +412,7 @@ function toggle_menu(){
     let res = toggle_id('navbar')
     if (!res){
         // If the menu is turned off --> also close the theme selector
-        disable_theme_popup()
+        //disable_theme_popup()
     }
 
     if (h2){

@@ -37,9 +37,7 @@ def FindFile(files, link, pb):
     search = False
     #searchstring = 'Pages/textfile.txt'
 
-    # remove leading / ../ or ./
-    if link[0] == '/':
-        link = link[1:]
+    # remove leading ../ or ./
     if link[0:2] == './':
         link = link[2:]
     while link[0:3] == '../':

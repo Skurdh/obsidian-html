@@ -1,5 +1,5 @@
 from __future__ import annotations
-import regex as re                   # regex string finding/replacing
+import re                   # regex string finding/replacing
 import yaml
 from pathlib import Path    # 
 import frontmatter          # remove yaml frontmatter from md files
@@ -69,7 +69,7 @@ class MarkdownPage:
         frontmatter_tags = self.metadata['tags']
 
         # get inline tags
-        inline_tags = [x[1:].replace('.','') for x in re.findall("(?<!\S)#[^\s#`]+(?!.*\">)", self.page)]
+        inline_tags = [x[1:].replace('.','') for x in re.findall("(?<!\S)#[^\s#`]+(?!.*\">)", self.page)] #(?<!\S)#[^\s#`]+
 
         # merge, and remove duplicates
         self.metadata['tags'] = list(set(frontmatter_tags + inline_tags))
@@ -114,19 +114,13 @@ class MarkdownPage:
         self.codelines = re.findall("`(.*?)`", self.page)
         for i, match in enumerate(self.codelines):
             self.page = self.page.replace("`"+match+"`", f'%%%codeline-placeholder-{i}%%%')
-
-        self.latexblocks = re.findall("^\$\$([\s\S]*?)\$\$[\s]*?$", self.page, re.MULTILINE)
-        for i, match in enumerate(self.latexblocks):
-            self.page = self.page.replace("$$"+match+"$$", f'%%%latexblock-placeholder-{i}%%%')
-
+           
     def RestoreCodeSections(self):
         """Undo the action of StripCodeSections."""
         for i, value in enumerate(self.codeblocks):
             self.page = self.page.replace(f'%%%codeblock-placeholder-{i}%%%', f"```{value}```\n")
         for i, value in enumerate(self.codelines):
-            self.page = self.page.replace(f'%%%codeline-placeholder-{i}%%%', f"`{value}`")
-        for i, value in enumerate(self.latexblocks):
-            self.page = self.page.replace(f'%%%latexblock-placeholder-{i}%%%', f"$${value}$$") 
+            self.page = self.page.replace(f'%%%codeline-placeholder-{i}%%%', f"`{value}`")  
 
     def add_tag(self, tag):
         if 'tags' not in self.metadata:
@@ -244,72 +238,25 @@ class MarkdownPage:
 
         # -- [3] Convert Obsidian type img links to proper md image links
         # Further conversion will be done in the block below
-        for link in re.findall("(?<=\!\[\[)(.*?)(?=\]\])", self.page):
-            if '|' in link:
-                parts = link.split('|')
-                l = parts.pop(0)
-                alias = '|'.join(parts)
-                new_link = f'![{alias}]('+urllib.parse.quote(l)+')'
-            else:
-                new_link = '![]('+urllib.parse.quote(link)+')'
+        for link in re.findall("(?<=\!\[\[)(.*?)(?=\])", self.page):
+            print("[3]", link)
+            new_link = '![]('+urllib.parse.quote(link)+')'
 
             # Obsidian page inclusions use the same tag...
             # Skip if we don't match image suffixes. Inclusions are handled at the end.
-            l = link.split('|')[0]
-            if len(l.split('.')) == 1 or l.split('.')[-1].lower() not in self.pb.gc('included_file_suffixes', cached=True):
-                new_link = f'<inclusion href="{l}" />'
+            if len(link.split('.')) == 1 or link.split('.')[-1].split('|')[0].lower() not in self.pb.gc('included_file_suffixes', cached=True):
+                new_link = f'<inclusion href="{link}" />'
 
             safe_link = re.escape('![['+link+']]')
             self.page = re.sub(safe_link, new_link, self.page)
 
-        for tag in re.findall(r'<img src=".*?/>', self.page):
-
-            # get template and link from tag
-            # e.g. <img src="200w.gif"  width="200"> --> <img src="{link}"  width="200"> & 200w.gif
-            parts = tag.split('src="')
-            iparts = parts[1].split('"', 1)
-            link = iparts[0]
-            template = parts[0] + 'src="{link}"' + iparts[1]
-
-            l = urllib.parse.unquote(link)
-            if '://' in l:
-                continue
-
-            # Find file
-            rel_path_str, lo = FindFile(self.pb.index.files, link, self.pb)
-            if rel_path_str == False:
-                if self.pb.gc('toggles/verbose_printout', cached=True):
-                    print(f"\t\tImage/file with obsidian link of '{link}' will not be copied over in this step.")
-                    if '://' in link:
-                        print("\t\t\t<continued> The link seems to be external (contains ://)")
-                    else:
-                        print(f"\t\t\t<continued> The link was not found in the file tree. Clean links in the file tree are: {', '.join(self.file_tree.keys())}")
-                continue
-
-            # Get shorthand info
-            relative_path = lo.path['markdown']['file_relative_path']
-
-            # Copy file over to markdown destination
-            lo.copy_file('ntm')
-
-            # Adjust link in page
-            file_name = urllib.parse.unquote(link)
-            relative_path = relative_path.as_posix()
-            relative_path = ('../' * page_folder_depth) + relative_path
-            new_link = template.replace('{link}', urllib.parse.quote(relative_path))
-
-            safe_link = re.escape(tag)
-            self.page = re.sub(safe_link, new_link, self.page)
-
-
         # -- [4] Handle local image/video/audio links (copy them over to output)
-        for tag, link in re.findall("(?<=\!\[(.*?)\]\()(.*?)(?=\))", self.page):
+        for link in re.findall("(?<=\!\[\]\()(.*?)(?=\))", self.page):
+            print("[4]", link)
             unq_link = urllib.parse.unquote(link)
             
             #clean_link_name = urllib.parse.unquote(link).split('/')[-1].split('|')[0]
             clean_link = unq_link.split('|')[0]
-            if clean_link.strip() == '':
-                continue
 
             # Find file
             rel_path_str, lo = FindFile(self.pb.index.files, clean_link, self.pb)
@@ -333,7 +280,7 @@ class MarkdownPage:
             file_name = urllib.parse.unquote(link)
             relative_path = relative_path.as_posix()
             relative_path = ('../' * page_folder_depth) + relative_path
-            new_link = f'![{tag}]('+urllib.parse.quote(relative_path)+')'
+            new_link = '![]('+urllib.parse.quote(relative_path)+')'
 
             # Handle video/audio usecase
             if lo.metadata['is_video']:
@@ -342,27 +289,17 @@ class MarkdownPage:
                 new_link = self.GetAudioHTML(file_name, relative_path, suffix)
             elif lo.metadata['is_embeddable']:
                 new_link = self.GetEmbeddable(file_name, relative_path, suffix)
-            elif tag != '':
-                width = ''
-                alt = ''
-                if tag.isdigit():
-                    width = tag
-                elif '|' in tag:
-                    parts = tag.split('|')
-                    if parts[-1].isdigit():
-                        width = parts.pop()
-                    alt = ''.join(parts)
-                else:
-                    alt = tag
-                new_link = f'<img src="{urllib.parse.quote(relative_path)}"  width="{width}" alt="{alt}" title="{alt}" />'
+            elif len(unq_link.split('|')) > 1:
+                new_link = f'<img src="{urllib.parse.quote(relative_path)}"  width="{unq_link.split("|")[-1]}">'
 
-            safe_link = re.escape(f'![{tag}]('+link+')')
+            safe_link = re.escape('![]('+link+')')
             self.page = re.sub(safe_link, new_link, self.page)
 
         # -- [5] Change file name in proper markdown links to path
         # And while we are busy, change the path to point to the full relative path
         proper_links = re.findall(r'(?<=\]\()[^\s\]]+(?=\))', self.page)
         for l in proper_links:
+            print("[5]", l)
             # There is currently no way to match links containing parentheses, AND not matching the last ) in a link like ([test](link))
             if l.endswith(')'):
                 l = l[:-1]
@@ -399,6 +336,7 @@ class MarkdownPage:
         # This is any string in between [[ and ]], e.g. [[My Note]]
         md_links = re.findall("(?<=\[\[).+?(?=\])", self.page)
         for l in md_links:
+            print("[6]", l)
             # A link in Obsidian can have the format 'filename|alias'
             # If a link does not have an alias, the link name will function as the alias.
             parts = l.split('|')
@@ -441,13 +379,8 @@ class MarkdownPage:
                     hashpart = hashpart.replace(' ', '-').lower()
                     newlink += f'#{hashpart}'
             else:
-                if hashpart[0] == '^':
-                    #blockid blocklink
-                    newlink = '#' + hashpart.replace('^','__')
-                else:
-                    # normal anchor
-                    newlink = '#' + slugify(hashpart)
-                    alias = hashpart
+                newlink = '#' + slugify(hashpart)
+                alias = hashpart
 
             # Replace Obsidian link with proper markdown link
             self.page = self.page.replace('[['+l+']]', f"[{alias}]({newlink})")
@@ -460,14 +393,16 @@ class MarkdownPage:
         # -- [8] Insert markdown links for bare http(s) links (those without the [name](link) format).
         # Cannot start with [, (, nor "
         # match 'http://* ' or 'https://* ' (end match by whitespace)
-        for l in re.findall("(?<![\[\(\"])https*:\/\/.[^\s|\"]*(?!.*\">)", self.page):
+        for l in re.findall("(?<![\[\(\"])https*:\/\/.[^\s|\"]*(?!.*\">)", self.page):  
+            print("[8]", l)
             new_md_link = f"[{l}]({l})"
             safe_link = re.escape(l)
             self.page = re.sub(f"(?<![\[\(])({safe_link})", new_md_link, self.page)
 
         # -- [9] Remove inline tags, like #ThisIsATag
         # Inline tags are # connected to text (so no whitespace nor another #)
-        for l in re.findall("(?<!\S)#[^\s#`:]+", self.page):
+        for l in re.findall("(?<!\S)#[^\s#`]+(?!.+<\/iframe>)", self.page):
+            print("[9]", l)
             tag = l.replace('.', '').replace('#', '')
             new_md_str = f"**{tag}**"
 
@@ -481,6 +416,7 @@ class MarkdownPage:
             
         # -- [10] Add code inclusions
         for l in re.findall(r'(\<inclusion href="[^"]*" />)', self.page, re.MULTILINE):
+            print("[610]", l)
             link = l.replace('<inclusion href="', '').replace('" />', '')
 
             result = GetObsidianFilePath(link, self.file_tree, self.pb)
@@ -489,7 +425,7 @@ class MarkdownPage:
 
 
             if file_object == False:
-                self.page = self.page.replace(l, f"> **obsidian-html error:** Could not find page {link}.")
+                self.page = self.page.replace(l, f"> **Obsidian-html erreur:** La page {link} n'existe pas.")
                 continue
             
             self.links.append(file_object)
@@ -503,7 +439,7 @@ class MarkdownPage:
             if not file_object.is_valid_note('note'):
                 self.page = self.page.replace(l, f"> **obsidian-html error:** Error including file or not a markdown file {link}.")
                 continue
-
+            
             # Get code
             #included_page = MarkdownPage(self.pb, file_object, 'note', self.file_tree)
             included_page = file_object.load_markdown_page('note')
@@ -536,6 +472,11 @@ class MarkdownPage:
             # add link to frontmatter yaml so that we can add it to the graphview
             if self.pb.gc('toggles/features/graph/show_inclusions_in_graph'):
                 self.AddInclusionLink(result['rtr_path_str'])
+
+        # -- [#296] Remove block references 
+        if remove_block_references:
+            self.page  = re.sub(r'(?<=\s)(\^\S*?)(?=$|\n)', '', self.page)
+
         # -- [1] Restore codeblocks/-lines
         self.RestoreCodeSections()
 

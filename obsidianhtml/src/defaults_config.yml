@@ -104,7 +104,8 @@ md_source_host_urls: []
 
 # Will be inputted into the Html template as page title
 # Not used anywhere else atm.
-site_name: 'Obsidian-Html/Notes'
+site_name: 'Obsidian-Html'
+site_subtitle: 'Documentation'
 
 # Use when deploying to https://mydomain.com/html_prefix/ instead of https://mydomain.com/
 # use '/html_prefix' (prepend slash, no slash at the end)
@@ -216,7 +217,6 @@ toggles:
       enabled: True
     embedded_note_titles:
       enabled: True
-      hide_on_h1: True          # don't add embedded title if the note starts with an h1
 
     search:
       enabled: True
