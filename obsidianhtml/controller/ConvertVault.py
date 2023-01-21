@@ -811,7 +811,7 @@ def crawl_markdown_notes_and_convert_to_html(fo:'FileObject', pb, backlink_node=
     # Cannot start with [, (, nor "
     # match 'http://* ' or 'https://* ' (end match by whitespace)
     # Note that note->md step also does this, this should be void if doing note-->html, but useful when doing md->html
-    for l in re.findall("(?<![\[\(\"])(https*:\/\/.[^\s]*)", md.page):
+    for l in re.findall("(?<![\[\(\"])https*:\/\/.[^\s|\"]*(?!.*\">)", md.page):
         new_md_link = f"[{l}]({l})"
         safe_link = re.escape(l)
         md.page = re.sub(f"(?<![\[\(])({safe_link})", new_md_link, md.page)

@@ -69,7 +69,7 @@ class MarkdownPage:
         frontmatter_tags = self.metadata['tags']
 
         # get inline tags
-        inline_tags = [x[1:].replace('.','') for x in re.findall("(?<!\S)#[^\s#`]+", self.page)]
+        inline_tags = [x[1:].replace('.','') for x in re.findall("(?<!\S)#[^\s#`]+(?!.*\">)", self.page)]
 
         # merge, and remove duplicates
         self.metadata['tags'] = list(set(frontmatter_tags + inline_tags))
@@ -460,7 +460,7 @@ class MarkdownPage:
         # -- [8] Insert markdown links for bare http(s) links (those without the [name](link) format).
         # Cannot start with [, (, nor "
         # match 'http://* ' or 'https://* ' (end match by whitespace)
-        for l in re.findall("(?<![\[\(\"])(https*:\/\/.[^\s|]*)", self.page):
+        for l in re.findall("(?<![\[\(\"])https*:\/\/.[^\s|\"]*(?!.*\">)", self.page):
             new_md_link = f"[{l}]({l})"
             safe_link = re.escape(l)
             self.page = re.sub(f"(?<![\[\(])({safe_link})", new_md_link, self.page)
